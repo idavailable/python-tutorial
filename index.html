@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python 小白起飞教程 · 零基础入门学习包</title>
+<style>
+  :root {
+    --bg: #f6f7f2; --card: #fff; --ink: #2b2a26; --muted: #75706a;
+    --green: #2b7a4b; --green-light: #e6f4ec; --blue: #2d6da3; --blue-light: #e8f1fa;
+    --line: #e5e2da; --shadow: 0 4px 16px rgba(60,60,50,.08);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink); min-height: 100vh;
+    font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif; line-height: 1.75;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 60px 22px 80px; }
+  header { text-align: center; margin-bottom: 46px; }
+  header .snake { font-size: 64px; line-height: 1; }
+  header h1 { font-size: 30px; margin: 14px 0 8px; }
+  header p { color: var(--muted); margin: 0; font-size: 15px; }
+  .cards { display: grid; gap: 18px; }
+  .card {
+    display: block; text-decoration: none; color: inherit; background: var(--card);
+    border: 1px solid var(--line); border-radius: 18px; padding: 26px 28px;
+    box-shadow: var(--shadow); transition: transform .15s, box-shadow .15s;
+    display: flex; gap: 20px; align-items: flex-start;
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 12px 26px rgba(60,60,50,.13); }
+  .ico {
+    flex: none; width: 58px; height: 58px; border-radius: 16px;
+    display: flex; align-items: center; justify-content: center; font-size: 30px;
+  }
+  .ico.g { background: var(--green-light); }
+  .ico.b { background: var(--blue-light); }
+  .card h2 { font-size: 19px; margin: 0 0 4px; }
+  .card .desc { color: var(--muted); font-size: 14px; margin: 0; }
+  .card .tag {
+    display: inline-block; font-size: 12px; color: var(--blue); background: var(--blue-light);
+    border-radius: 99px; padding: 1px 12px; margin-top: 10px;
+  }
+  .steps {
+    background: var(--card); border: 1px solid var(--line); border-radius: 18px;
+    padding: 24px 28px; margin-top: 34px; box-shadow: var(--shadow);
+  }
+  .steps h3 { margin: 0 0 12px; font-size: 17px; }
+  .flow { font-family: Consolas, monospace; font-size: 14px; color: var(--green); white-space: pre-line; line-height: 2; }
+  .steps ul { padding-left: 20px; margin: 12px 0 0; font-size: 14.5px; }
+  footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 50px; }
+  footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="snake">🐍</div>
+    <h1>Python 小白起飞教程</h1>
+    <p>零基础学习包 · 图文教程 + 闯关游戏 · 浏览器打开即用，无需安装</p>
+  </header>
+
+  <div class="cards">
+    <a class="card" href="python入门教程.html">
+      <div class="ico g">📖</div>
+      <div>
+        <h2>手把手图文教程</h2>
+        <p class="desc">从装 Python 开始，变量、判断、循环、列表、字典、函数一路讲完，配 30+ 段可运行代码和「运行结果」对照，最后带做两个实战项目：猜数字游戏、能存文件的小账本。</p>
+        <span class="tag">预计 3~4 小时入门</span>
+      </div>
+    </a>
+
+    <a class="card" href="python闯关岛.html">
+      <div class="ico b">🎮</div>
+      <div>
+        <h2>Python 闯关岛（学习游戏）</h2>
+        <p class="desc">8 关解锁制，每关先看知识卡再答题。四种题型考「主动回忆」：选一选、猜输出、点词填空、找 Bug。答错的题会重新出现直到学会，进度自动保存，通关可领毕业证书。</p>
+        <span class="tag">建议先玩这个建立信心</span>
+      </div>
+    </a>
+  </div>
+
+  <div class="steps">
+    <h3>🚀 建议学习路径</h3>
+    <div class="flow">① 玩游戏通关 → 记住语法 + 建立信心
+② 读教程实战项目 → 真正动手敲代码
+③ 自己改造项目 → 加功能，比如给账本加统计图表</div>
+    <ul>
+      <li>看不懂就跟着敲，敲错再改 —— 这是唯一有效的学法</li>
+      <li>每天 30 分钟，比周末狂肝 5 小时管用</li>
+      <li>报错不是失败，是 Python 在跟你说话（教程第 10 步有自救指南）</li>
+    </ul>
+  </div>
+
+  <footer>
+    开源仓库：<a href="https://github.com/idavailable/python-tutorial">idavailable/python-tutorial</a> · 欢迎 Star ⭐
+  </footer>
+</div>
+</body>
+</html>
