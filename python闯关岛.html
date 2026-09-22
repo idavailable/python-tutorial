@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python 闯关岛 · 边玩边学</title>
+<style>
+  :root {
+    --bg: #f6f7f2;
+    --card: #ffffff;
+    --ink: #2b2a26;
+    --muted: #75706a;
+    --green: #2b7a4b;
+    --green-light: #e6f4ec;
+    --blue: #2d6da3;
+    --blue-light: #e8f1fa;
+    --line: #e5e2da;
+    --code-bg: #f4f2ee;
+    --gold: #f0a500;
+    --red: #d64545;
+    --red-light: #fdeeee;
+    --shadow: 0 4px 16px rgba(60,60,50,.08);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+    line-height: 1.7; min-height: 100vh;
+  }
+  #app { max-width: 720px; margin: 0 auto; padding: 24px 18px 60px; }
+
+  /* ===== 顶部状态栏 ===== */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 10px 18px; margin-bottom: 22px; box-shadow: var(--shadow);
+    position: sticky; top: 12px; z-index: 10;
+  }
+  .topbar .logo { font-weight: bold; font-size: 17px; }
+  .topbar .stats { display: flex; gap: 14px; font-size: 14px; color: var(--muted); }
+  .topbar .stats b { color: var(--green); }
+
+  /* ===== 首页 ===== */
+  .home-hero { text-align: center; margin: 18px 0 26px; }
+  .home-hero h1 { font-size: 26px; margin: 0 0 6px; }
+  .home-hero p { color: var(--muted); margin: 0; font-size: 14.5px; }
+  .levels { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 560px) { .levels { grid-template-columns: 1fr; } }
+  .lv-card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    padding: 18px 20px; cursor: pointer; transition: transform .15s, box-shadow .15s;
+    box-shadow: var(--shadow); display: flex; gap: 14px; align-items: center;
+  }
+  .lv-card:hover:not(.locked) { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(60,60,50,.13); }
+  .lv-card.locked { opacity: .55; cursor: not-allowed; filter: grayscale(.6); }
+  .lv-icon {
+    font-size: 28px; width: 52px; height: 52px; flex: none;
+    background: var(--green-light); border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .lv-card.done .lv-icon { background: #fdf3dd; }
+  .lv-info { flex: 1; min-width: 0; }
+  .lv-info .t { font-weight: bold; font-size: 15.5px; }
+  .lv-info .d { font-size: 12.5px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .stars { font-size: 14px; letter-spacing: 2px; margin-top: 4px; }
+  .star-on { color: var(--gold); }
+  .star-off { color: #d8d4cb; }
+  .lock { font-size: 18px; }
+  .reset-row { text-align: center; margin-top: 26px; }
+  .reset-btn {
+    border: none; background: none; color: var(--muted); font-size: 12.5px;
+    cursor: pointer; text-decoration: underline;
+  }
+
+  /* ===== 通用按钮 ===== */
+  .btn {
+    display: inline-block; border: none; cursor: pointer; font-family: inherit;
+    background: var(--green); color: #fff; font-size: 16px; font-weight: bold;
+    padding: 12px 30px; border-radius: 12px; transition: transform .1s, opacity .15s;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn:active { transform: scale(.97); }
+  .btn.ghost { background: #fff; color: var(--ink); border: 1.5px solid var(--line); font-weight: normal; }
+  .btn.blue { background: var(--blue); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+
+  /* ===== 知识卡 ===== */
+  .screen { animation: fadein .3s; }
+  @keyframes fadein { from { opacity: 0; transform: translateY(10px);} to { opacity: 1; transform: none;} }
+  .lesson-card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 18px;
+    padding: 28px 30px; box-shadow: var(--shadow);
+  }
+  .lesson-card h2 { margin: 0 0 4px; font-size: 21px; }
+  .lesson-card .sub { color: var(--muted); font-size: 13.5px; margin-bottom: 16px; }
+  .lesson-card ul { padding-left: 20px; margin: 8px 0; }
+  .lesson-card li { margin: 7px 0; }
+  .lesson-card pre {
+    background: var(--code-bg); border: 1px solid var(--line); border-radius: 10px;
+    padding: 10px 14px; font-size: 13.5px; font-family: Consolas, "Courier New", monospace;
+    overflow-x: auto; margin: 8px 0;
+  }
+  .lesson-tip {
+    background: var(--blue-light); border-radius: 12px; padding: 10px 16px;
+    font-size: 14px; margin-top: 14px;
+  }
+  .center { text-align: center; margin-top: 22px; }
+
+  /* ===== 答题界面 ===== */
+  .quiz-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-size: 14px; color: var(--muted); }
+  .progress-track { height: 8px; background: #e9e6df; border-radius: 99px; overflow: hidden; margin-bottom: 22px; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--green), #4ca873); border-radius: 99px; transition: width .4s; }
+  .q-card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 18px;
+    padding: 26px 28px; box-shadow: var(--shadow);
+  }
+  .q-type {
+    display: inline-block; font-size: 12px; color: var(--blue); background: var(--blue-light);
+    border-radius: 99px; padding: 2px 12px; margin-bottom: 12px;
+  }
+  .q-text { font-size: 17px; font-weight: bold; margin-bottom: 14px; }
+  pre.codebox {
+    background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px;
+    padding: 14px 18px; font-size: 14.5px; font-family: Consolas, "Courier New", monospace;
+    overflow-x: auto; margin: 0 0 16px; line-height: 1.75;
+  }
+  .opts { display: grid; gap: 10px; }
+  .opt {
+    background: #fbfaf7; border: 2px solid var(--line); border-radius: 12px;
+    padding: 12px 16px; cursor: pointer; font-size: 15px; text-align: left;
+    font-family: inherit; transition: border-color .15s, background .15s; width: 100%;
+  }
+  .opt:hover:not(:disabled) { border-color: var(--green); background: var(--green-light); }
+  .opt.mono { font-family: Consolas, monospace; }
+  .opt.correct { border-color: var(--green); background: var(--green-light); }
+  .opt.wrong { border-color: var(--red); background: var(--red-light); }
+  .opt:disabled { cursor: default; }
+
+  /* 填空题 */
+  .blank {
+    display: inline-block; min-width: 90px; border-bottom: 3px dashed var(--green);
+    color: var(--green); font-weight: bold; text-align: center; padding: 0 6px;
+  }
+  .blank.filled { background: var(--green-light); border-radius: 6px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+  .chip {
+    background: #fff; border: 2px solid var(--line); border-radius: 99px;
+    padding: 8px 20px; cursor: pointer; font-size: 14.5px; font-family: Consolas, monospace;
+    transition: all .15s;
+  }
+  .chip:hover { border-color: var(--green); background: var(--green-light); }
+  .chip.used { opacity: .3; pointer-events: none; }
+  .chip.chip-action { font-family: inherit; font-size: 14px; padding: 10px 24px; }
+
+  /* 反馈区 */
+  .feedback {
+    border-radius: 14px; padding: 14px 18px; margin-top: 18px; font-size: 14.5px;
+    display: none; animation: pop .25s;
+  }
+  @keyframes pop { from { transform: scale(.96); opacity: 0;} to { transform: none; opacity: 1;} }
+  .feedback.good { background: var(--green-light); border: 1px solid #b5dfc6; display: block; }
+  .feedback.bad { background: var(--red-light); border: 1px solid #f0c4c4; display: block; }
+  .feedback .verdict { font-weight: bold; font-size: 15.5px; margin-bottom: 4px; }
+
+  /* ===== 结算 ===== */
+  .result-card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 20px;
+    padding: 40px 30px; text-align: center; box-shadow: var(--shadow);
+  }
+  .result-card .big { font-size: 52px; }
+  .result-card h2 { margin: 8px 0 4px; }
+  .result-card .stars-big { font-size: 34px; letter-spacing: 6px; margin: 12px 0; }
+  .result-card .msg { color: var(--muted); font-size: 14.5px; }
+  .result-btns { display: flex; gap: 12px; justify-content: center; margin-top: 26px; flex-wrap: wrap; }
+
+  /* 毕业证书 */
+  .cert {
+    background: linear-gradient(135deg, #fffdf5, #fdf6e0);
+    border: 3px solid var(--gold); border-radius: 20px;
+    padding: 46px 34px; text-align: center; box-shadow: 0 10px 30px rgba(240,165,0,.18);
+  }
+  .cert h1 { font-size: 30px; margin: 10px 0; }
+  .cert .seal { font-size: 64px; }
+  .cert p { color: #6b5d33; }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <div class="logo">🐍 Python 闯关岛</div>
+    <div class="stats">
+      <span>⭐ <b id="total-stars">0</b>/24</span>
+      <span>🔥 <b id="combo">0</b> 连对</span>
+    </div>
+  </div>
+  <div id="screen"></div>
+</div>
+
+<script>
+/* ================= 关卡数据 ================= */
+const LEVELS = [
+{
+  name: "第 1 关 · 和电脑打招呼", icon: "👋", theme: "print 与基本规则",
+  lesson: [
+    "print() 是让电脑<b>说话</b>的命令，说的话要用<b>英文引号</b>包起来。",
+    "代码里的引号、括号、逗号全部用<b>英文的</b>，中文标点是报错大户！",
+    "Python 区分大小写：print ✔ ，Print ✘",
+    "电脑还会算数：+ 加、- 减、* 乘、/ 除"
+  ],
+  questions: [
+    { t:"choice", q:"下面哪一行能正确打印出「你好」？",
+      opts:['print("你好")','Print("你好")','print（"你好"）','print("你好"）'], mono:true, ans:0,
+      ex:"必须是小写 print + 英文括号 + 英文引号。B 大写了，C 和 D 用了中文括号。"},
+    { t:"output", q:"运行后屏幕上显示什么？",
+      code:'print("a" + "b")',
+      opts:['ab','a b','a+b','报错'], mono:true, ans:0,
+      ex:"两个字符串用 + 会拼在一起，中间不会自动加空格。"},
+    { t:"choice", q:"哪个是合法的变量名？",
+      opts:['name_2','2name','my-name','my name'], mono:true, ans:0,
+      ex:"变量名只能用字母、数字、下划线，且不能以数字开头，不能有空格和减号。"},
+    { t:"output", q:"运行结果是什么？",
+      code:'print(2 + 3 * 4)',
+      opts:['20','14','23','报错'], mono:true, ans:1,
+      ex:"先乘除后加减：3*4=12，再加 2，得 14。和数学课一个规矩。"}
+  ]
+},
+{
+  name: "第 2 关 · 贴标签的艺术", icon: "🏷️", theme: "变量与类型",
+  lesson: [
+    "变量 = 贴了名字的盒子：<code>age = 12</code> 就是把 12 放进 age 盒子。",
+    "常见类型：<b>字符串</b> \"文字\"、<b>整数</b> 12、<b>小数</b> 1.5、<b>布尔</b> True/False",
+    "类型转换三兄弟：<code>int()</code> 转整数、<code>str()</code> 转文字、<code>float()</code> 转小数",
+    "f-string：引号前加 f，变量用 {} 塞进文字 → <code>f\"我 {age} 岁\"</code>"
+  ],
+  questions: [
+    { t:"output", q:"屏幕上打印什么？",
+      code:'x = 5\nx = 7\nprint(x)',
+      opts:['5','7','12','报错'], mono:true, ans:1,
+      ex:"后赋的值会覆盖前面的，x 最终是 7。"},
+    { t:"choice", q:"input() 让用户输入 100，程序拿到的是什么类型？",
+      opts:['字符串 "100"','整数 100','小数 100.0','不确定'], mono:false, ans:0,
+      ex:"input 拿到的一切都是文字！要计算必须先 int() 转换。这是新手第一大坑。"},
+    { t:"fill", q:"让程序正确算出「明年多少岁」，横线上该填什么？",
+      code:'age = input("你几岁？")\nage = ___(age)\nprint(age + 1)',
+      opts:['int','str','print','input'], ans:'int',
+      ex:"input 给的是文字，没法 +1，必须先用 int() 转成整数。"},
+    { t:"output", q:"运行结果是什么？",
+      code:'name = "小明"\nage = 12\nprint(f"{name}明年{age + 1}岁")',
+      opts:['小明明年12岁','{name}明年{age+1}岁','小明明年13岁','报错'], mono:false, ans:2,
+      ex:"f-string 里 {} 会被替换成变量的值，age+1 还能直接算，得 13。"}
+  ]
+},
+{
+  name: "第 3 关 · 看情况办事", icon: "🚦", theme: "if 判断",
+  lesson: [
+    "if = 如果；elif = 否则如果；else = 否则",
+    "if 条件后面<b>别忘了冒号 :</b>，下面要执行的代码要<b>缩进</b>（按 Tab）",
+    "比较符号：== 等于、!= 不等于、&gt; &lt; &gt;= &lt;=",
+    "一个等号 = 是「装东西」，两个等号 == 是「问是不是」"
+  ],
+  questions: [
+    { t:"bug", q:"这段代码有一行会报错，是哪一行？",
+      code:'1  score = 80\n2  if score >= 60\n3      print("及格")',
+      opts:['第 1 行','第 2 行','第 3 行','没错误'], mono:true, ans:1,
+      ex:"if 条件后面漏了冒号 : 。这是新手最高频的报错之一。"},
+    { t:"output", q:"运行结果是什么？",
+      code:'age = 15\nif age >= 18:\n    print("成年")\nelse:\n    print("未成年")',
+      opts:['成年','未成年','两个都打印','报错'], mono:true, ans:1,
+      ex:"15 < 18 不满足 if 的条件，走 else 分支。"},
+    { t:"choice", q:"「分数在 80 到 100 之间」用代码怎么表达？",
+      opts:['80 <= score and score <= 100','80 <= score or score <= 100','80 ≤ score ≤ 100','score = 80~100'], mono:true, ans:0,
+      ex:"「之间」= 两个条件同时成立，要用 and。or 是「满足一个就行」。"},
+    { t:"fill", q:"补全代码：只有答对了才打印「+10 分」。横线填什么？",
+      code:'answer = "B"\nif answer ___ "B":\n    print("+10分")',
+      opts:['==','=','!=','>'], ans:'==',
+      ex:"判断「是不是」要用两个等号 ==。一个等号是赋值，会让条件永远为真，很危险。"}
+  ]
+},
+{
+  name: "第 4 关 · 不知疲倦的工人", icon: "🔁", theme: "循环",
+  lesson: [
+    "for 循环 = 知道次数地重复：<code>for i in range(5):</code> 转 5 圈",
+    "注意：range(5) 是 0、1、2、3、4 —— <b>从 0 开始，不含 5</b>",
+    "while 循环 = 条件满足就一直转，别忘了让条件最终变 False，否则死循环！",
+    "break = 立刻跳出整个循环；continue = 跳过这轮，继续下一轮"
+  ],
+  questions: [
+    { t:"output", q:"打印了什么？",
+      code:'for i in range(3):\n    print(i)',
+      opts:['1 2 3','0 1 2','0 1 2 3','1 2 3 4'], mono:true, ans:1,
+      ex:"range(3) 从 0 数到 2，共 3 个数。程序世界从 0 开始数数！"},
+    { t:"output", q:"打印了几行「干活」？",
+      code:'count = 0\nwhile count < 3:\n    print("干活")\n    count = count + 1',
+      opts:['2 行','3 行','4 行','无限行（死循环）'], mono:true, ans:1,
+      ex:"count 从 0 变到 3 时条件不再成立，正好打印 3 次。count+1 这步就是「退场机制」。"},
+    { t:"output", q:"运行结果是什么？",
+      code:'for i in range(1, 6):\n    if i == 3:\n        continue\n    print(i)',
+      opts:['1 2 3 4 5','1 2 4 5','1 2','1 2 4'], mono:true, ans:1,
+      ex:"到 3 时 continue 跳过本轮（不打印 3），其余照常。"},
+    { t:"fill", q:"想打印 1 到 100，横线填什么？",
+      code:'for i in range(___, 101):\n    print(i)',
+      opts:['0','1','2','100'], ans:'1',
+      ex:"range(1, 101) 从 1 数到 100（终点不含）。起点填 1。"}
+  ]
+},
+{
+  name: "第 5 关 · 排好队的盒子", icon: "📦", theme: "列表",
+  lesson: [
+    "列表 = 一排盒子排好队：<code>fruits = [\"苹果\", \"香蕉\", \"橘子\"]</code>",
+    "取东西用下标：<code>fruits[0]</code> 是第 1 个！<code>fruits[-1]</code> 是最后一个",
+    "常用操作：append() 加、len() 数个数、del 删除",
+    "for 和列表是绝配：<code>for f in fruits:</code> 逐个处理"
+  ],
+  questions: [
+    { t:"output", q:"打印什么？",
+      code:'fruits = ["苹果", "香蕉", "橘子"]\nprint(fruits[1])',
+      opts:['苹果','香蕉','橘子','报错'], mono:true, ans:1,
+      ex:"下标从 0 开始：[0] 苹果、[1] 香蕉、[2] 橘子。"},
+    { t:"output", q:"打印什么？",
+      code:'nums = [10, 20, 30, 40]\nprint(nums[-1] + nums[0])',
+      opts:['50','30','60','报错'], mono:true, ans:0,
+      ex:"[-1] 是最后一个 40，[0] 是第一个 10，40+10=50。"},
+    { t:"fill", q:"往列表末尾加一个「西瓜」，横线填什么？",
+      code:'fruits = ["苹果", "香蕉"]\nfruits.___("西瓜")',
+      opts:['push','append','add','insert'], ans:'append',
+      ex:"Python 列表用 append 加东西。push 是别的语言（JavaScript）的写法。"},
+    { t:"output", q:"打印什么？",
+      code:'nums = [5, 8, 2]\nnums[0] = 9\nprint(len(nums))',
+      opts:['3','4','9','2'], mono:true, ans:0,
+      ex:"改值不改变个数，列表里还是 3 个东西，len 是 3。"}
+  ]
+},
+{
+  name: "第 6 关 · 贴标签的柜子", icon: "🗄️", theme: "字典",
+  lesson: [
+    "字典 = 每个格子都贴了标签的柜子：<code>{\"name\": \"小明\", \"age\": 12}</code>",
+    "用标签(key)取值：<code>student[\"name\"]</code> → \"小明\"",
+    "改值就再赋一次，加新数据直接 <code>student[\"新标签\"] = 值</code>",
+    "什么时候用字典：描述一个东西的<b>各种属性</b>；一堆同类东西用列表"
+  ],
+  questions: [
+    { t:"output", q:"打印什么？",
+      code:'student = {"name": "小明", "age": 12}\nprint(student["age"])',
+      opts:['name','12','age','报错'], mono:true, ans:1,
+      ex:"用标签 \"age\" 取出对应的值 12。"},
+    { t:"fill", q:"给 student 加一项「爱好：打游戏」，横线填什么？",
+      code:'student = {"name": "小明"}\nstudent[___] = "打游戏"',
+      opts:['"hobby"','hobby','student','游戏'], ans:'"hobby"',
+      ex:"标签是字符串，要加引号！student[\"hobby\"] = \"打游戏\" 就加上了。"},
+    { t:"choice", q:"要保存全班 40 个同学的姓名，用什么最合适？",
+      opts:['列表 names = ["小明", "小红", ...]','字典 {"小明": ..., "小红": ...}','40 个单独的变量','一个字符串全拼一起'], mono:true, ans:0,
+      ex:"一堆<b>同类</b>的东西 → 列表；描述<b>一个东西的多种属性</b> → 字典。"},
+    { t:"output", q:"打印什么？",
+      code:'d = {"a": 1, "b": 2}\nd["c"] = 3\nd["a"] = 100\nprint(d["a"] + d["c"])',
+      opts:['103','4','100','报错'], mono:true, ans:0,
+      ex:"d[\"a\"] 被改成 100，d[\"c\"] 是新加的 3，100+3=103。"}
+  ]
+},
+{
+  name: "第 7 关 · 代码打包工", icon: "🧰", theme: "函数",
+  lesson: [
+    "函数 = 给一段代码起名字，以后喊名字就能用：<code>def greet(name):</code>",
+    "括号里的是<b>参数</b>（传进去的数据），调用时：<code>greet(\"小明\")</code>",
+    "return = 把结果<b>交回给程序</b>接着用；print 只是「喊出来给人看」",
+    "好处：写一次到处用、代码像句子一样能读、改一处全生效"
+  ],
+  questions: [
+    { t:"fill", q:"定义一个函数，横线填什么？",
+      code:'___ say_hi():\n    print("hi!")',
+      opts:['def','function','func','define'], ans:'def',
+      ex:"Python 用 def 定义函数，function 是 JavaScript 的写法。"},
+    { t:"output", q:"打印什么？",
+      code:'def add(a, b):\n    return a + b\n\nresult = add(2, 3)\nprint(result * 10)',
+      opts:['50','23','5','报错'], mono:true, ans:0,
+      ex:"add(2,3) 用 return 交回 5，接进 result，5*10=50。"},
+    { t:"choice", q:"print 和 return 的区别，哪个说法对？",
+      opts:['print 给人看，return 把结果交回给程序继续用','两个完全一样','return 会把结果显示在屏幕上','print 能把结果交给下一个函数用'], mono:false, ans:0,
+      ex:"print 只是显示；return 是交回结果。想让结果参与后续计算，必须 return。"},
+    { t:"output", q:"打印什么？",
+      code:'def double(x):\n    return x * 2\n\nprint(double(double(3)))',
+      opts:['12','6','9','报错'], mono:true, ans:0,
+      ex:"里面的 double(3) 得 6，再交给外面的 double，6*2=12。函数可以套着用。"}
+  ]
+},
+{
+  name: "第 8 关 · 报错猎人大考", icon: "🕵️", theme: "综合 + 排错",
+  lesson: [
+    "报错不是失败，是 Python 在跟你说话！<b>重点看报错的最后一行</b>。",
+    "SyntaxError：标点/语法写错（中文符号、漏冒号）",
+    "TypeError：类型用错（\"1\" + 1）；ValueError：值不对（int(\"abc\")）",
+    "NameError：变量名打错；IndentationError：缩进乱；IndexError：下标越界"
+  ],
+  questions: [
+    { t:"choice", q:"<code>print(\"你好\")</code>（用的是中文引号）会报什么错？",
+      opts:['SyntaxError（语法错误）','NameError','TypeError','能正常运行'], mono:true, ans:0,
+      ex:"中文标点 Python 不认识，直接语法错误。写代码请把输入法切成英文！"},
+    { t:"choice", q:"<code>\"5\" + 5</code> 会发生什么？",
+      opts:['TypeError：文字不能加数字','得 10','得 \"55\"','ValueError'], mono:true, ans:0,
+      ex:"文字 + 数字是类型错误。要么 int(\"5\")+5 得 10，要么 \"5\"+str(5) 得 \"55\"。"},
+    { t:"choice", q:"<code>int(\"abc\")</code> 会报什么？",
+      opts:['ValueError','TypeError','SyntaxError','NameError'], mono:true, ans:0,
+      ex:"int() 转换的<b>类型</b>没问题（是字符串），但内容 abc 没法变成数字——值不对，ValueError。"},
+    { t:"output", q:"综合题！打印什么？",
+      code:'def total(nums):\n    s = 0\n    for n in nums:\n        s = s + n\n    return s\n\nprices = [10, 20, 30]\nprint(f"总价：{total(prices)}元")',
+      opts:['总价：60元','总价：102030元','总价：10元','报错'], mono:true, ans:0,
+      ex:"循环把 10+20+30 累加成 60，return 交回，f-string 拼进句子。恭喜，这已经是真实项目的代码了！"}
+  ]
+}
+];
+
+/* ================= 状态 ================= */
+const SAVE_KEY = "pyquest_save_v1";
+let save = JSON.parse(localStorage.getItem(SAVE_KEY) || '{"stars":[]}');
+function persist() { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); }
+let state = { lv: 0, qi: 0, queue: [], retry: [], firstTry: new Set(), wrongCount: 0, combo: 0, phase: "lesson" };
+
+const screenEl = document.getElementById("screen");
+const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+function renderCode(code) { return '<pre class="codebox">' + esc(code) + "</pre>"; }
+
+function updateTopbar() {
+  const total = (save.stars || []).reduce((a,b)=>a+b, 0);
+  document.getElementById("total-stars").textContent = total;
+  document.getElementById("combo").textContent = state.combo;
+}
+
+/* ================= 首页 ================= */
+function renderHome() {
+  state.combo = state.combo || 0;
+  updateTopbar();
+  let cards = LEVELS.map((lv, i) => {
+    const unlocked = i === 0 || (save.stars[i-1] || 0) > 0;
+    const st = save.stars[i] || 0;
+    const stars = unlocked
+      ? [0,1,2].map(k => `<span class="${k < st ? 'star-on':'star-off'}">★</span>`).join("")
+      : "";
+    return `<div class="lv-card ${unlocked?'':'locked'} ${st>0?'done':''}" data-i="${i}">
+      <div class="lv-icon">${unlocked ? lv.icon : "🔒"}</div>
+      <div class="lv-info">
+        <div class="t">${lv.name}</div>
+        <div class="d">${lv.theme}</div>
+        ${unlocked ? `<div class="stars">${stars || '<span style="font-size:12px;color:var(--muted)">未挑战</span>'}</div>` : `<div class="d" style="margin-top:4px">通过上一关解锁</div>`}
+      </div>
+    </div>`;
+  }).join("");
+  const allDone = LEVELS.every((_, i) => (save.stars[i]||0) > 0);
+  screenEl.innerHTML = `
+    <div class="screen">
+      <div class="home-hero">
+        <h1>🐍 Python 闯关岛</h1>
+        <p>8 关 · 每关知识卡 + 4 道题 · 错题会重新考 · 全对拿 3 星</p>
+        ${allDone ? '<p style="color:var(--gold);font-weight:bold;font-size:16px">🏆 全部通关！去下方领取你的毕业证书！</p>' : ''}
+      </div>
+      <div class="levels">${cards}</div>
+      <div class="reset-row"><button class="reset-btn" id="reset">重置全部进度</button></div>
+      ${allDone ? `<div class="center"><button class="btn blue" id="cert-btn">🎓 领取毕业证书</button></div>` : ""}
+    </div>`;
+  screenEl.querySelectorAll(".lv-card").forEach(el => {
+    el.addEventListener("click", () => {
+      const i = +el.dataset.i;
+      const unlocked = i === 0 || (save.stars[i-1]||0) > 0;
+      if (unlocked) startLevel(i);
+    });
+  });
+  const rb = document.getElementById("reset");
+  if (rb) rb.addEventListener("click", () => {
+    if (confirm("确定清空全部星星记录，从头开始吗？")) { save = {stars:[]}; persist(); renderHome(); }
+  });
+  const cb = document.getElementById("cert-btn");
+  if (cb) cb.addEventListener("click", renderCert);
+}
+
+/* ================= 知识卡 ================= */
+function startLevel(i) {
+  state.lv = i; state.phase = "lesson"; state.combo = 0;
+  const lv = LEVELS[i];
+  screenEl.innerHTML = `<div class="screen">
+    <div class="lesson-card">
+      <h2>${lv.icon} ${lv.name}</h2>
+      <div class="sub">主题：${lv.theme} · 先花 1 分钟看完这张知识卡</div>
+      <ul>${lv.lesson.map(x => `<li>${x}</li>`).join("")}</ul>
+      <div class="lesson-tip">💡 答错不要慌：错题会在本关末尾<b>重新出现</b>，直到你真正学会为止。这叫「错题重考」，是效率最高的记法。</div>
+      <div class="center"><button class="btn" id="go-quiz">看完了，开始答题！</button></div>
+    </div>
+  </div>`;
+  document.getElementById("go-quiz").addEventListener("click", () => {
+    state.qi = 0; state.retry = []; state.firstTry = new Set(); state.wrongCount = 0;
+    state.queue = lv.questions.map((_, k) => k);
+    renderQuestion();
+  });
+}
+
+/* ================= 答题 ================= */
+function renderQuestion() {
+  updateTopbar();
+  const lv = LEVELS[state.lv];
+  const idx = state.queue[state.qi];
+  const q = lv.questions[idx];
+  const isRetry = state.retry.includes(state.qi);
+  const totalQ = lv.questions.length + state.retry.filter(x => x < state.qi).length;
+  const pct = Math.round(state.qi / (lv.questions.length + state.retry.length) * 100);
+  const typeLabel = {choice:"🤔 选一选", output:"👀 猜输出", fill:"✏️ 填空格", bug:"🐛 找错误"}[q.t];
+
+  let body = "";
+  if (q.t === "fill") {
+    const parts = q.code.split("___");
+    body = `<pre class="codebox">${esc(parts[0])}<span class="blank" id="blank"></span>${esc(parts[1] || "")}</pre>
+      <div class="chips" id="chips">${q.opts.map(o =>
+        `<button class="chip" data-v="${esc(o)}">${esc(o)}</button>`).join("")}
+        <button class="chip chip-action" id="fill-clear" style="border-style:dashed">🧹 重填</button>
+      </div>
+      <div class="center"><button class="btn" id="check" disabled>检查答案</button></div>`;
+  } else {
+    body = (q.code ? renderCode(q.code) : "") +
+      `<div class="opts">${q.opts.map((o, k) =>
+        `<button class="opt ${q.mono?'mono':''}" data-k="${k}">${esc(o)}</button>`).join("")}</div>`;
+  }
+
+  screenEl.innerHTML = `<div class="screen">
+    <div class="quiz-head"><span>${lv.icon} ${lv.name}${isRetry?' <span style="color:var(--gold)">· 错题重考</span>':''}</span><span>第 ${state.qi+1} / ${lv.questions.length + state.retry.length} 题</span></div>
+    <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <div class="q-card">
+      <span class="q-type">${typeLabel}</span>
+      <div class="q-text">${q.q}</div>
+      ${body}
+      <div class="feedback" id="fb"></div>
+    </div>
+  </div>`;
+
+  const fb = document.getElementById("fb");
+
+  if (q.t === "fill") {
+    let picked = null;
+    const blank = document.getElementById("blank");
+    const checkBtn = document.getElementById("check");
+    screenEl.querySelectorAll(".chip[data-v]").forEach(chip => {
+      chip.addEventListener("click", () => {
+        screenEl.querySelectorAll(".chip").forEach(c => c.classList.remove("used"));
+        chip.classList.add("used");
+        picked = chip.dataset.v;
+        blank.textContent = picked;
+        blank.classList.add("filled");
+        checkBtn.disabled = false;
+      });
+    });
+    document.getElementById("fill-clear").addEventListener("click", () => {
+      picked = null; blank.textContent = ""; blank.classList.remove("filled");
+      checkBtn.disabled = true;
+      screenEl.querySelectorAll(".chip[data-v]").forEach(c => c.classList.remove("used"));
+    });
+    checkBtn.addEventListener("click", () => judge(picked === q.ans, q, checkBtn, fb, idx));
+  } else {
+    screenEl.querySelectorAll(".opt").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const k = +btn.dataset.k;
+        screenEl.querySelectorAll(".opt").forEach(b => b.disabled = true);
+        screenEl.querySelectorAll(".opt")[q.ans].classList.add("correct");
+        if (k !== q.ans) btn.classList.add("wrong");
+        judge(k === q.ans, q, null, fb, idx);
+      });
+    });
+  }
+}
+
+function judge(ok, q, btn, fb, idx) {
+  if (ok) {
+    state.combo++;
+    state.firstTry.add(idx);
+    fb.className = "feedback good";
+    fb.innerHTML = `<div class="verdict">✅ 答对了！${state.combo >= 3 ? `🔥 ${state.combo} 连对！` : ""}</div><div>${q.ex}</div>
+      <div class="center"><button class="btn" id="next">下一题 →</button></div>`;
+  } else {
+    state.combo = 0; state.wrongCount++;
+    if (!state.retry.includes(idx)) state.retry.push(idx);
+    fb.className = "feedback bad";
+    fb.innerHTML = `<div class="verdict">❌ 差一点点～ 记住这个：</div><div>${q.ex}</div>
+      <div class="center"><button class="btn ghost" id="next">我记住了，继续 →</button></div>`;
+  }
+  updateTopbar();
+  document.getElementById("next").addEventListener("click", () => {
+    state.qi++;
+    if (state.qi < state.queue.length) { renderQuestion(); }
+    else if (state.retry.length) { // 错题重考
+      state.queue = state.retry.slice(); state.retry = []; state.qi = 0;
+      state.retake = true;
+      renderQuestion();
+    } else { finishLevel(); }
+  });
+}
+
+/* ================= 结算 ================= */
+function finishLevel() {
+  const lv = LEVELS[state.lv];
+  const firstTryCount = [...state.firstTry].filter(i => lv.questions[i]).length;
+  const mistakes = state.wrongCount;
+  const stars = mistakes === 0 ? 3 : mistakes <= 2 ? 2 : 1;
+  save.stars[state.lv] = Math.max(save.stars[state.lv] || 0, stars);
+  persist(); updateTopbar();
+  const msgs = {
+    3: ["🏆", "完美通关！", "一道都没错，这个知识点已经焊死在你脑子里了。"],
+    2: ["🎉", "顺利通关！", "错了几题但都订正回来了，下次争取全对拿 3 星。"],
+    1: ["💪", "通关！", "虽然绕了点弯路，但错题全部搞懂了——这就是学习。"]
+  };
+  const [emoji, title, msg] = msgs[stars];
+  const allDone = LEVELS.every((_, i) => (save.stars[i]||0) > 0);
+  const hasNext = state.lv < LEVELS.length - 1;
+  screenEl.innerHTML = `<div class="screen">
+    <div class="result-card">
+      <div class="big">${emoji}</div>
+      <h2>${title}</h2>
+      <div class="stars-big">${[0,1,2].map(k=>`<span class="${k<stars?'star-on':'star-off'}">★</span>`).join("")}</div>
+      <p class="msg">${msg}</p>
+      <p class="msg">本关首次答对 ${firstTryCount}/${lv.questions.length} 题 · 共订正 ${mistakes} 次</p>
+      <div class="result-btns">
+        <button class="btn ghost" id="again">🔁 再刷一遍</button>
+        ${hasNext ? '<button class="btn" id="nextlv">下一关 →</button>'
+                  : (allDone ? '<button class="btn blue" id="cert">🎓 领取毕业证书</button>' : '<button class="btn" id="backhome">回到小岛</button>')}
+      </div>
+    </div>
+  </div>`;
+  document.getElementById("again").addEventListener("click", () => startLevel(state.lv));
+  const nl = document.getElementById("nextlv");
+  if (nl) nl.addEventListener("click", () => startLevel(state.lv + 1));
+  const bk = document.getElementById("backhome");
+  if (bk) bk.addEventListener("click", renderHome);
+  const ct = document.getElementById("cert");
+  if (ct) ct.addEventListener("click", renderCert);
+}
+
+/* ================= 毕业证书 ================= */
+function renderCert() {
+  const name = prompt("输入你的名字，刻在证书上：", "未来程序员") || "未来程序员";
+  const total = (save.stars || []).reduce((a,b)=>a+b, 0);
+  screenEl.innerHTML = `<div class="screen">
+    <div class="cert">
+      <div class="seal">🎓</div>
+      <h1>Python 入门毕业证书</h1>
+      <p>兹证明</p>
+      <h1 style="border-bottom:2px solid var(--gold);display:inline-block;padding:0 20px">${esc(name)}</h1>
+      <p>已成功通关「Python 闯关岛」全部 8 关</p>
+      <p>累计获得 ⭐ ${total} / 24 颗</p>
+      <p style="margin-top:18px">你现在掌握了 print、变量、判断、循环、列表、字典、函数和排错——<br>接下来去写真正的项目吧：先试试教程里的「猜数字游戏」和「小账本」！</p>
+      <p style="margin-top:22px;font-size:13px">Python 闯关岛 · ${new Date().toLocaleDateString("zh-CN")}</p>
+    </div>
+    <div class="center"><button class="btn ghost" id="back" style="margin-top:22px">回到小岛</button></div>
+  </div>`;
+  document.getElementById("back").addEventListener("click", renderHome);
+}
+
+/* ================= 启动 ================= */
+renderHome();
+</script>
+</body>
+</html>

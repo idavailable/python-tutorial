@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python 小白起飞手册 · 手把手版</title>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --card: #ffffff;
+    --ink: #2d2a26;
+    --muted: #6f6a63;
+    --accent: #2b7a4b;
+    --accent-light: #e6f4ec;
+    --code-bg: #f4f2ee;
+    --line: #e6e2db;
+    --warn-bg: #fff6e6;
+    --warn-line: #f0c987;
+    --tip-bg: #eef4ff;
+    --tip-line: #a9c4f0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--ink);
+    font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+    line-height: 1.85; font-size: 16px;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, #2b7a4b, #1d5e8a);
+    color: #fff; border-radius: 18px; padding: 42px 36px; margin-bottom: 40px;
+  }
+  header.hero h1 { margin: 0 0 10px; font-size: 30px; }
+  header.hero p { margin: 4px 0; opacity: .92; }
+  .badge {
+    display: inline-block; background: rgba(255,255,255,.18);
+    border: 1px solid rgba(255,255,255,.35); border-radius: 999px;
+    padding: 2px 14px; font-size: 13px; margin-bottom: 14px;
+  }
+  h2 {
+    font-size: 22px; margin: 52px 0 6px; padding-left: 12px;
+    border-left: 5px solid var(--accent);
+  }
+  h2 .step { color: var(--accent); font-size: 14px; margin-right: 8px; }
+  h3 { font-size: 17px; margin: 28px 0 8px; }
+  p { margin: 10px 0; }
+  .muted { color: var(--muted); font-size: 14px; }
+  .card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 14px; padding: 20px 22px; margin: 16px 0;
+  }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--line);
+    border-radius: 10px; padding: 14px 16px; overflow-x: auto;
+    font-family: Consolas, "Courier New", monospace; font-size: 14px;
+    line-height: 1.7; margin: 10px 0;
+  }
+  code {
+    font-family: Consolas, "Courier New", monospace;
+    background: var(--code-bg); border-radius: 4px; padding: 1px 6px; font-size: 14px;
+  }
+  pre code { background: none; padding: 0; }
+  .out {
+    background: #21242b; color: #d8dee9; border-radius: 10px;
+    padding: 12px 16px; font-family: Consolas, monospace; font-size: 13.5px;
+    margin: -4px 0 14px; overflow-x: auto; white-space: pre-wrap;
+  }
+  .out::before { content: "运行结果"; display: block; font-size: 11px; color: #8a93a5; margin-bottom: 6px; letter-spacing: 2px; }
+  .warn {
+    background: var(--warn-bg); border: 1px solid var(--warn-line);
+    border-radius: 12px; padding: 12px 18px; margin: 14px 0; font-size: 14.5px;
+  }
+  .tip {
+    background: var(--tip-bg); border: 1px solid var(--tip-line);
+    border-radius: 12px; padding: 12px 18px; margin: 14px 0; font-size: 14.5px;
+  }
+  .warn b, .tip b { display: block; margin-bottom: 4px; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 14.5px; background: var(--card); }
+  th, td { border: 1px solid var(--line); padding: 8px 12px; text-align: left; }
+  th { background: var(--accent-light); }
+  .toc {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 20px 26px; margin-bottom: 10px;
+  }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .toc ol { margin: 8px 0; padding-left: 22px; }
+  .check {
+    color: var(--accent); font-weight: bold;
+  }
+  .file-tag {
+    display: inline-block; background: #eee9e0; border-radius: 6px;
+    font-size: 12.5px; padding: 1px 8px; color: #7a6f5d; margin-right: 6px;
+  }
+  footer { margin-top: 70px; text-align: center; color: var(--muted); font-size: 13.5px; }
+  .comment { color: #8a8f98; }
+  .kw { color: #b03a8c; }
+  .str { color: #2b7a4b; }
+  .num { color: #b5621a; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="badge">面向小小白 · 零基础 · 一次学会</div>
+  <h1>🐍 Python 小白起飞手册</h1>
+  <p>不背概念、不灌术语。跟着做，每一步都能在自己电脑上跑出结果。</p>
+  <p>预计总用时：认真跟着敲，约 3~4 小时入门。</p>
+</header>
+
+<div class="toc">
+  <b>📑 目录</b>
+  <ol>
+    <li><a href="#s1">第一步：把 Python 装进电脑（5 分钟）</a></li>
+    <li><a href="#s2">第二步：写下人生第一行代码</a></li>
+    <li><a href="#s3">第三步：变量 —— 给东西贴标签</a></li>
+    <li><a href="#s4">第四步：和电脑对话（输入与输出）</a></li>
+    <li><a href="#s5">第五步：让电脑做选择（if 判断）</a></li>
+    <li><a href="#s6">第六步：让电脑重复干活（循环）</a></li>
+    <li><a href="#s7">第七步：装东西的容器（列表与字典）</a></li>
+    <li><a href="#s8">第八步：把代码打包（函数）</a></li>
+    <li><a href="#s9">实战项目：猜数字游戏 + 小账本</a></li>
+    <li><a href="#s10">报错了怎么办？（必看的自救指南）</a></li>
+    <li><a href="#s11">学完之后去哪儿？</a></li>
+  </ol>
+</div>
+
+<!-- ========== 1 ========== -->
+<h2 id="s1"><span class="step">STEP 1</span>把 Python 装进电脑（5 分钟）</h2>
+
+<p>Python 是一个「程序」，要先装到电脑上，电脑才认识它。</p>
+
+<div class="card">
+  <h3>Windows 用户（大多数人）</h3>
+  <p>1️⃣ 打开官网下载页：<code>python.org/downloads</code>，点黄色大按钮下载。</p>
+  <p>2️⃣ 双击安装包。<b>最重要的一步来了：</b></p>
+  <div class="warn"><b>⚠️ 千万别漏掉</b>安装第一屏最下面有个 <b>"Add Python to PATH"</b> 的勾选框，一定要勾上！不勾的话，后面命令会找不到 Python，是新手第一大坑。</div>
+  <p>3️⃣ 一路点 <b>Install Now</b>，等它跑完。</p>
+  <p>4️⃣ 验证：按 <code>Win + R</code>，输入 <code>cmd</code> 回车，打开黑色窗口，输入：</p>
+  <pre><code>python --version</code></pre>
+  <p class="out">Python 3.13.1</p>
+  <p class="check">✔ 只要能显示版本号，就装好了！</p>
+</div>
+
+<div class="card">
+  <h3>Mac 用户</h3>
+  <p>Mac 自带一个旧版 Python，建议还是去官网装新版。下载 <code>macOS 64-bit installer</code>，双击一路下一步即可。验证方式：打开「终端」（Terminal），同样输入 <code>python3 --version</code>。</p>
+</div>
+
+<div class="tip"><b>💡 给你选个趁手的编辑器</b>
+装好 Python 后，别用记事本写代码。推荐 <b>VS Code</b>（免费、最主流）或者 <b>PyCharm 社区版</b>（对新手更友好，开箱即用）。本教程两种都行，跟着敲就好。
+</div>
+
+<!-- ========== 2 ========== -->
+<h2 id="s2"><span class="step">STEP 2</span>写下人生第一行代码</h2>
+
+<p>先建立两个认知，后面不迷路：</p>
+<table>
+  <tr><th>两种用法</th><th>是什么</th><th>类比</th></tr>
+  <tr><td>交互模式</td><td>在黑窗口里输入一行，立刻出结果</td><td>像聊天，说完就忘</td></tr>
+  <tr><td>脚本模式</td><td>把代码写进 .py 文件，一次运行</td><td>像写作文，能保存反复用</td></tr>
+</table>
+
+<p>咱两样都试一下。</p>
+
+<div class="card">
+  <h3>① 交互模式：先随便聊聊</h3>
+  <p>打开 cmd（Mac 开终端），输入 <code>python</code> 回车，会看到 <code>&gt;&gt;&gt;</code> 符号——这是 Python 在说「你说，我听着呢」。</p>
+  <pre><code>&gt;&gt;&gt; print("你好，世界")
+&gt;&gt;&gt; 1 + 1</code></pre>
+  <p class="out">你好，世界
+2</p>
+  <p>注意到没？<code>1 + 1</code> 连 print 都不用写，它直接把答案甩给你。这个窗口就是你的「计算器+草稿纸」。</p>
+  <p>输入 <code>exit()</code> 可以退出这个模式。</p>
+</div>
+
+<div class="card">
+  <h3>② 脚本模式：写第一个程序文件</h3>
+  <p>打开 VS Code → 新建文件 → 保存为 <span class="file-tag">hello.py</span>（后缀必须是 .py），输入：</p>
+  <pre><code><span class="comment"># 我的第一个程序</span>
+print(<span class="str">"大家好，我是未来的程序员！"</span>)
+print(<span class="str">"今天是我学 Python 的第 1 天"</span>)</code></pre>
+  <p>然后在文件所在文件夹打开终端（Windows 用户：在文件夹地址栏输入 <code>cmd</code> 回车，超好用），运行：</p>
+  <pre><code>python hello.py</code></pre>
+  <p class="out">大家好，我是未来的程序员！
+今天是我学 Python 的第 1 天</p>
+</div>
+
+<div class="warn"><b>⚠️ 新手必踩坑</b>
+① 代码里的引号、括号<b>必须用英文的</b>（" 而不是 “），中文标点是报错大户。
+② Python <b>区分大小写</b>：<code>Print</code> 和 <code>print</code> 是两个东西，只有小写的 print 才有效。
+</div>
+
+<!-- ========== 3 ========== -->
+<h2 id="s3"><span class="step">STEP 3</span>变量 —— 给东西贴标签</h2>
+
+<p>变量就是一个「贴了名字的盒子」，把数据放进去，以后凭名字取用。</p>
+
+<pre><code>name = <span class="str">"小明"</span>      <span class="comment"># 字符串：一段文字，要加引号</span>
+age = 12           <span class="comment"># 整数：不带小数点的数</span>
+height = 1.55      <span class="comment"># 浮点数：带小数点的数</span>
+is_student = True  <span class="comment"># 布尔值：只有 True / False 两种</span>
+
+print(name, age, height, is_student)</code></pre>
+<p class="out">小明 12 1.55 True</p>
+
+<p>盒子里的东西可以换（所以叫「变」量）：</p>
+<pre><code>score = 60
+print(score)
+score = 95        <span class="comment"># 旧值 60 被覆盖，从此 score 是 95</span>
+print(score)</code></pre>
+<p class="out">60
+95</p>
+
+<div class="tip"><b>💡 起名规矩（就 3 条）</b>
+① 只能用字母、数字、下划线，且不能以数字开头（<code>2name</code> ❌，<code>name2</code> ✔）。
+② 不能用 Python 的保留词做名字（如 <code>if</code>、<code>print</code>、<code>for</code>）。
+③ 建议起「见名知意」的名字：<code>price</code> 比 <code>a</code> 强一万倍。
+</div>
+
+<h3>数据之间可以互相转换</h3>
+<pre><code>age_text = <span class="str">"12"</span>          <span class="comment"># 这是文字，不能拿来做加法</span>
+age_num = int(age_text)  <span class="comment"># 转成整数</span>
+print(age_num + 1)
+
+print(<span class="str">"我今年 "</span> + str(12) + <span class="str">" 岁"</span>)  <span class="comment"># 数字要 str() 转成文字才能和文字拼接</span></code></pre>
+<p class="out">13
+我今年 12 岁</p>
+
+<!-- ========== 4 ========== -->
+<h2 id="s4"><span class="step">STEP 4</span>和电脑对话（输入与输出）</h2>
+
+<p>程序最基本的能力：听你说话（input），回答你（print）。</p>
+
+<pre><code>name = input(<span class="str">"你叫什么名字？"</span>)
+print(<span class="str">"你好呀，"</span> + name + <span class="str">"！"</span>)</code></pre>
+<p class="out">你叫什么名字？小红
+你好呀，小红！</p>
+
+<div class="warn"><b>⚠️ 超级大坑：input 拿到的一切都是文字</b>
+就算你输入 100，它拿到的也是文字 "100"。要做数学计算，必须先用 <code>int()</code> 转换：
+</div>
+<pre><code>birth_year = input(<span class="str">"你哪年出生？"</span>)
+age = 2026 - int(birth_year)   <span class="comment"># 必须转 int，否则文字没法做减法</span>
+print(<span class="str">"你今年"</span>, age, <span class="str">"岁"</span>)</code></pre>
+
+<h3>f-string：拼字符串最优雅的写法（记住它！）</h3>
+<p>引号前面加个 <code>f</code>，变量直接用 <code>{}</code> 包起来塞进文字里，不用再手拼加号：</p>
+<pre><code>name = <span class="str">"小明"</span>
+age = 12
+print(f<span class="str">"{name} 今年 {age} 岁，明年 {age + 1} 岁"</span>)</code></pre>
+<p class="out">小明 今年 12 岁，明年 13 岁</p>
+<p class="muted">顺便：<code>age + 1</code> 放在 f-string 里也能直接算，很爽。</p>
+
+<!-- ========== 5 ========== -->
+<h2 id="s5"><span class="step">STEP 5</span>让电脑做选择（if 判断）</h2>
+
+<p>程序聪明与否，就看它会不会「看情况办事」。if 就是「如果…就…」：</p>
+
+<pre><code>score = int(input(<span class="str">"你的分数："</span>))
+
+<span class="kw">if</span> score >= 90:
+    print(<span class="str">"太棒了！🎉"</span>)
+<span class="kw">elif</span> score >= 60:
+    print(<span class="str">"及格啦，继续加油"</span>)
+<span class="kw">else</span>:
+    print(<span class="str">"下次一定行！"</span>)</code></pre>
+
+<div class="warn"><b>⚠️ Python 最独特的规矩：缩进</b>
+if 下面的代码要<b>往右缩进一格</b>（VS Code 里按 Tab 自动搞定）。缩进相同的代码属于同一组。
+Python 靠缩进来理解「哪些代码归 if 管」，缩错了程序直接报错或逻辑错乱。这是新手第二大坑。
+</div>
+
+<h3>常用的比较符号</h3>
+<table>
+  <tr><th>符号</th><th>意思</th><th>例子</th></tr>
+  <tr><td>==</td><td>等于（注意是两个等号！一个等号是赋值）</td><td>age == 18</td></tr>
+  <tr><td>!=</td><td>不等于</td><td>answer != "y"</td></tr>
+  <tr><td>&gt; &nbsp; &lt;</td><td>大于 / 小于</td><td>score &gt; 60</td></tr>
+  <tr><td>&gt;= &nbsp; &lt;=</td><td>大于等于 / 小于等于</td><td>price &lt;= 100</td></tr>
+  <tr><td>and</td><td>并且（两个条件都满足）</td><td>age &gt; 6 and age &lt; 12</td></tr>
+  <tr><td>or</td><td>或者（满足一个就行）</td><td>day == "六" or day == "日"</td></tr>
+  <tr><td>not</td><td>反过来</td><td>not is_raining</td></tr>
+</table>
+
+<div class="tip"><b>💡 一个等号 vs 两个等号</b>
+<code>age = 18</code> 是「把 18 放进 age 盒子」（赋值）；<code>age == 18</code> 是「问问 age 是不是 18」（比较）。打错这两个，程序就抽风，但很多时候不报错，极难排查——从第一天就养成习惯。
+</div>
+
+<!-- ========== 6 ========== -->
+<h2 id="s6"><span class="step">STEP 6</span>让电脑重复干活（循环）</h2>
+
+<p>电脑最强的地方是不知疲倦。让它重复 100 遍？一句话的事。</p>
+
+<h3>for 循环：知道要重复几次时用</h3>
+<pre><code><span class="kw">for</span> i <span class="kw">in</span> range(5):
+    print(f<span class="str">"这是第 {i + 1} 遍"</span>)</code></pre>
+<p class="out">这是第 1 遍
+这是第 2 遍
+这是第 3 遍
+这是第 4 遍
+这是第 5 遍</p>
+<p class="muted">注意：range(5) 是从 0 数到 4，一共 5 个数，不含 5。程序世界从 0 开始数数，习惯就好。</p>
+
+<h3>while 循环：不知道几次，满足条件就一直转</h3>
+<pre><code>count = 3
+<span class="kw">while</span> count > 0:
+    print(f<span class="str">"倒计时：{count}"</span>)
+    count = count - 1
+print(<span class="str">"发射！🚀"</span>)</code></pre>
+<p class="out">倒计时：3
+倒计时：2
+倒计时：1
+发射！🚀</p>
+
+<div class="warn"><b>⚠️ 死循环警告</b>
+while 的条件永远为真时，程序会永远转下去（风扇狂转的那种）。写 while 时先想清楚：<b>什么时刻条件会变成 False？</b>想不出来就别按回车。
+</div>
+
+<h3>两个循环小开关</h3>
+<pre><code><span class="kw">for</span> i <span class="kw">in</span> range(1, 6):
+    <span class="kw">if</span> i == 3:
+        <span class="kw">continue</span>   <span class="comment"># 跳过 3，直接下一轮</span>
+    <span class="kw">if</span> i == 5:
+        <span class="kw">break</span>      <span class="comment"># 到 5 直接整个循环结束</span>
+    print(i)</code></pre>
+<p class="out">1
+2
+4</p>
+
+<!-- ========== 7 ========== -->
+<h2 id="s7"><span class="step">STEP 7</span>装东西的容器（列表与字典）</h2>
+
+<h3>列表 list：一排盒子排好队</h3>
+<pre><code>fruits = [<span class="str">"苹果"</span>, <span class="str">"香蕉"</span>, <span class="str">"橘子"</span>]
+
+print(fruits[0])      <span class="comment"># 取第 1 个（从 0 开始！）</span>
+print(fruits[-1])     <span class="comment"># -1 表示最后一个，超好用</span>
+
+fruits.append(<span class="str">"西瓜"</span>)  <span class="comment"># 往末尾加一个</span>
+fruits[0] = <span class="str">"草莓"</span>     <span class="comment"># 改第 1 个</span>
+print(fruits)
+print(len(fruits))    <span class="comment"># 数一下有几个</span></code></pre>
+<p class="out">苹果
+橘子
+['草莓', '香蕉', '橘子', '西瓜']
+4</p>
+
+<h3>遍历列表：for 和列表是绝配</h3>
+<pre><code><span class="kw">for</span> fruit <span class="kw">in</span> fruits:
+    print(f<span class="str">"我喜欢吃 {fruit}"</span>)</code></pre>
+
+<h3>字典 dict：按「名字」取东西的柜子</h3>
+<p>列表靠位置（0、1、2…）取东西，字典靠标签（key）取，更适合描述一个「对象」：</p>
+<pre><code>student = {
+    <span class="str">"name"</span>: <span class="str">"小明"</span>,
+    <span class="str">"age"</span>: 12,
+    <span class="str">"hobby"</span>: <span class="str">"打游戏"</span>,
+}
+
+print(student[<span class="str">"name"</span>])         <span class="comment"># 用标签取值</span>
+student[<span class="str">"age"</span>] = 13            <span class="comment"># 改</span>
+student[<span class="str">"grade"</span>] = <span class="str">"初一"</span>      <span class="comment"># 加新标签</span>
+print(student)</code></pre>
+<p class="out">小明
+{'name': '小明', 'age': 13, 'hobby': '打游戏', 'grade': '初一'}</p>
+
+<div class="tip"><b>💡 什么时候用哪个？</b>
+一堆<b>同类</b>的东西（购物车、名单）→ 列表。
+描述<b>一个东西的各种属性</b>（一个人、一件商品）→ 字典。
+两者还能嵌套：列表里装字典，就是「一群人的档案」，真实项目里天天用。
+</div>
+
+<!-- ========== 8 ========== -->
+<h2 id="s8"><span class="step">STEP 8</span>把代码打包（函数）</h2>
+
+<p>同一段代码要写很多遍？包成一个函数，起个名，以后喊名字就能用。</p>
+
+<pre><code><span class="kw">def</span> greet(name):              <span class="comment"># def 定义函数，name 是参数</span>
+    print(f<span class="str">"你好，{name}！"</span>)
+    print(<span class="str">"欢迎来到 Python 世界"</span>)
+
+greet(<span class="str">"小明"</span>)                  <span class="comment"># 调用：喊名字，把数据传进去</span>
+greet(<span class="str">"小红"</span>)</code></pre>
+
+<h3>会「回报结果」的函数：return</h3>
+<p>print 只是「喊出来给人听」，return 是「把结果交回给程序接着用」——这是新手最容易混的一点：</p>
+<pre><code><span class="kw">def</span> add(a, b):
+    <span class="kw">return</span> a + b     <span class="comment"># 把结果交出去</span>
+
+result = add(3, 5)   <span class="comment"># 接住结果</span>
+print(result * 2)    <span class="comment"># 结果还能继续用</span></code></pre>
+<p class="out">16</p>
+
+<div class="tip"><b>💡 为什么要用函数？</b>
+① 同样的逻辑写一次到处用；② 代码有了名字，看代码像读句子；③ 出了问题只改一处。以后写超过 50 行的程序，就该想着「这段能不能提成函数」。
+</div>
+
+<!-- ========== 9 ========== -->
+<h2 id="s9"><span class="step">STEP 9</span>实战项目：猜数字游戏 + 小账本</h2>
+
+<p>前面学的所有东西，在这两个小项目里全部用到。别复制——<b>自己敲一遍</b>，敲错再修，这才是真学习。</p>
+
+<div class="card">
+  <h3>🎮 项目一：猜数字游戏</h3>
+  <p class="muted">用到：import、while、if、input、int</p>
+  <p>新建 <span class="file-tag">guess.py</span>：</p>
+  <pre><code><span class="kw">import</span> random   <span class="comment"># Python 自带的"随机数工具箱"</span>
+
+answer = random.randint(1, 100)   <span class="comment"># 1~100 之间随机出一个数</span>
+count = 0
+
+print(<span class="str">"我想好了一个 1~100 的数字，猜猜看！"</span>)
+
+<span class="kw">while</span> True:
+    guess = int(input(<span class="str">"你猜："</span>))
+    count = count + 1
+
+    <span class="kw">if</span> guess > answer:
+        print(<span class="str">"大了，往小猜 👇"</span>)
+    <span class="kw">elif</span> guess &lt; answer:
+        print(<span class="str">"小了，往大猜 👆"</span>)
+    <span class="kw">else</span>:
+        print(f<span class="str">"猜对了！答案是 {answer}，你用了 {count} 次 🎉"</span>)
+        <span class="kw">break</span></code></pre>
+  <p>运行 <code>python guess.py</code>，玩几把。玩通关后试着改造它：<b>只允许猜 7 次，超了就失败</b>——改造成功说明你真的懂了。</p>
+</div>
+
+<div class="card">
+  <h3>💰 项目二：小账本（能存进文件的）</h3>
+  <p class="muted">用到：while、字典、列表、文件读写、函数</p>
+  <p>新建 <span class="file-tag">ledger.py</span>：</p>
+  <pre><code><span class="kw">import</span> json   <span class="comment"># 用来把数据存成文件的工具</span>
+
+RECORD_FILE = <span class="str">"ledger.json"</span>
+
+<span class="kw">def</span> load_records():
+    <span class="comment"># 启动时把之前记的账读回来</span>
+    <span class="kw">try</span>:
+        <span class="kw">with</span> open(RECORD_FILE, <span class="str">"r"</span>, encoding=<span class="str">"utf-8"</span>) <span class="kw">as</span> f:
+            <span class="kw">return</span> json.load(f)
+    <span class="kw">except</span> FileNotFoundError:
+        <span class="kw">return</span> []   <span class="comment"># 第一次用还没有文件，返回空列表</span>
+
+<span class="kw">def</span> save_records(records):
+    <span class="kw">with</span> open(RECORD_FILE, <span class="str">"w"</span>, encoding=<span class="str">"utf-8"</span>) <span class="kw">as</span> f:
+        json.dump(records, f, ensure_ascii=<span class="kw">False</span>, indent=2)
+
+records = load_records()
+
+<span class="kw">while</span> True:
+    print(<span class="str">"\n===== 小账本 ====="</span>)
+    print(<span class="str">"1. 记一笔  2. 查看全部  3. 算总账  4. 退出"</span>)
+    choice = input(<span class="str">"选个功能："</span>)
+
+    <span class="kw">if</span> choice == <span class="str">"1"</span>:
+        what = input(<span class="str">"买了啥："</span>)
+        how_much = float(input(<span class="str">"花了多少钱："</span>))
+        records.append({<span class="str">"item"</span>: what, <span class="str">"money"</span>: how_much})
+        save_records(records)
+        print(<span class="str">"记好啦 ✔"</span>)
+
+    <span class="kw">elif</span> choice == <span class="str">"2"</span>:
+        <span class="kw">if</span> len(records) == 0:
+            print(<span class="str">"还没有账目哦"</span>)
+        <span class="kw">for</span> i, r <span class="kw">in</span> enumerate(records, start=1):
+            print(f<span class="str">"{i}. {r['item']}：{r['money']} 元"</span>)
+
+    <span class="kw">elif</span> choice == <span class="str">"3"</span>:
+        total = 0
+        <span class="kw">for</span> r <span class="kw">in</span> records:
+            total = total + r[<span class="str">"money"</span>]
+        print(f<span class="str">"总共花了 {total} 元"</span>)
+
+    <span class="kw">elif</span> choice == <span class="str">"4"</span>:
+        print(<span class="str">"bye~ 记得省钱"</span>)
+        <span class="kw">break</span>
+
+    <span class="kw">else</span>:
+        print(<span class="str">"看清楚再选哦（输入 1/2/3/4）"</span>)</code></pre>
+  <p>跑起来记几笔账，关掉重开——账还在！因为它学会了「用文件记住数据」。这时候你就已经会写一个<b>真正有用的小软件</b>了。</p>
+</div>
+
+<!-- ========== 10 ========== -->
+<h2 id="s10"><span class="step">STEP 10</span>报错了怎么办？（必看的自救指南）</h2>
+
+<p>先说结论：<b>报错不是失败，是 Python 在跟你说话。</b>老手每天看几十个报错。你要学会的是「读懂它」。</p>
+
+<h3>看报错的姿势：翻到最后一行</h3>
+<p>报错信息一大坨，重点永远是<b>最后一行</b>。常见的是这几个：</p>
+<table>
+  <tr><th>报错</th><th>人话</th><th>怎么修</th></tr>
+  <tr><td>SyntaxError</td><td>语法写错了</td><td>检查是不是漏了冒号 <code>:</code>、引号、括号</td></tr>
+  <tr><td>IndentationError</td><td>缩进不对</td><td>统一用 Tab 或 4 空格，别混着来</td></tr>
+  <tr><td>NameError</td><td>用了不存在的变量</td><td>检查拼写（十有八九是打错字了）</td></tr>
+  <tr><td>TypeError</td><td>类型用错了</td><td>典型：<code>"1" + 1</code>，文字不能加数字，转 int/str</td></tr>
+  <tr><td>ValueError</td><td>值不对</td><td>典型：<code>int("abc")</code>，abc 转不成数字</td></tr>
+  <tr><td>IndexError</td><td>取的位置不存在</td><td>列表只有 3 个元素却取 [3]，检查下标</td></tr>
+  <tr><td>KeyError</td><td>字典里没这个标签</td><td>检查 key 拼写</td></tr>
+</table>
+
+<h3>自救三连</h3>
+<p>1️⃣ <b>读最后一行报错</b> → 对照上表定位问题。</p>
+<p>2️⃣ <b>print 大法</b> → 在可疑的地方打印变量的值，看看和你以为的是不是一样：</p>
+<pre><code>print(f<span class="str">"DEBUG: 此刻 guess = {guess}, 类型是 {type(guess)}"</span>)</code></pre>
+<p>3️⃣ <b>缩小范围</b> → 把代码砍到最小，只留出错的那一小段单独跑，问题会自己现形。</p>
+
+<div class="tip"><b>💡 终极心法</b>
+报错信息直接复制去搜（或丢给 AI 助手），90% 的问题别人都踩过。但你得先自己读一遍——练一年后，你瞄一眼就知道错哪儿了。
+</div>
+
+<!-- ========== 11 ========== -->
+<h2 id="s11"><span class="step">STEP 11</span>学完之后去哪儿？</h2>
+
+<table>
+  <tr><th>你想做什么</th><th>下一步学什么</th></tr>
+  <tr><td>写小工具、自动化办公（批量改文件、处理 Excel）</td><td>标准库：<code>os</code>、<code>pathlib</code>、<code>openpyxl</code></td></tr>
+  <tr><td>做网站 / 网页后端</td><td>Flask（简单）或 FastAPI（现代）</td></tr>
+  <tr><td>做数据图表、分析</td><td>pandas + matplotlib</td></tr>
+  <tr><td>玩 AI</td><td>先学好 pandas/numpy，再碰 PyTorch</td></tr>
+  <tr><td>写小游戏</td><td>pygame</td></tr>
+</table>
+
+<h3>给小白的三条真心话</h3>
+<div class="card">
+  <p>💪 <b>敲，别抄。</b>看教程觉得「懂了」是错觉，手敲出来才算数。错一次，记住一次。</p>
+  <p>🎯 <b>做小东西，别刷完教程。</b>学完本篇就可以做：记账本、密码生成器、批量重命名文件工具、每日一句英语提醒……从自己真的会用的东西开始。</p>
+  <p>🐢 <b>每天 30 分钟 &gt; 周末狂肝 5 小时。</b>编程是肌肉记忆，细水长流才留得住。</p>
+</div>
+
+<footer>
+  🐍 Python 小白起飞手册 · 跟着敲完，你已经超过 90% 只收藏不行动的人了
+</footer>
+
+</div>
+</body>
+</html>
