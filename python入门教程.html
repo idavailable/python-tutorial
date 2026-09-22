@@ -5,42 +5,58 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Python 小白起飞手册 · 手把手版</title>
 <style>
+  /* ===== 全站统一设计变量 · v1（浅色 / 松石绿） ===== */
   :root {
-    --bg: #fafaf7;
+    --accent: #17795f;
+    --accent-deep: #0e5744;
+    --accent-500: #24a081;
+    --accent-soft: #e7f3ef;
+    --accent-line: #b9dcd1;
+    --accent-glow: rgba(23, 121, 95, .14);
+    --accent2: #1d6a78;
+    --accent2-soft: #e6f1f3;
+    --bg: #f2f6f5;
     --card: #ffffff;
-    --ink: #2d2a26;
-    --muted: #6f6a63;
-    --accent: #2b7a4b;
-    --accent-light: #e6f4ec;
-    --code-bg: #f4f2ee;
-    --line: #e6e2db;
-    --warn-bg: #fff6e6;
-    --warn-line: #f0c987;
-    --tip-bg: #eef4ff;
-    --tip-line: #a9c4f0;
+    --ink: #1d2b28;
+    --ink-soft: #3d4a47;
+    --muted: #6c7b77;
+    --line: #e3ebe8;
+    --line-soft: #eff4f2;
+    --gold: #c08a12;
+    --gold-soft: #fdf4de;
+    --shadow-sm: 0 2px 6px rgba(16, 54, 44, .05);
+    --shadow: 0 4px 16px rgba(16, 54, 44, .07);
+    --shadow-lg: 0 14px 34px rgba(16, 54, 44, .13);
+    --r-sm: 10px; --r: 12px; --r-md: 14px; --r-lg: 18px; --r-pill: 999px;
+    /* 兼容旧变量名 */
+    --accent-light: var(--accent-soft);
+    --code-bg: #eef3f1;
+    --warn-bg: #fdf6e9;  --warn-line: #edd3a1;
+    --tip-bg: #e6f1f3;   --tip-line: #b7d5da;
   }
   * { box-sizing: border-box; }
   body {
     margin: 0; padding: 0;
     background: var(--bg); color: var(--ink);
-    font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
-    line-height: 1.85; font-size: 16px;
+    font-family: "Microsoft YaHei", "PingFang SC", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.85; font-size: 16px; -webkit-font-smoothing: antialiased;
   }
   .wrap { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
   header.hero {
-    background: linear-gradient(135deg, #2b7a4b, #1d5e8a);
-    color: #fff; border-radius: 18px; padding: 42px 36px; margin-bottom: 40px;
+    background: linear-gradient(135deg, var(--accent-deep), var(--accent2));
+    color: #fff; border-radius: var(--r-lg); padding: 42px 36px; margin-bottom: 40px;
+    box-shadow: var(--shadow-lg);
   }
   header.hero h1 { margin: 0 0 10px; font-size: 30px; }
   header.hero p { margin: 4px 0; opacity: .92; }
   .badge {
     display: inline-block; background: rgba(255,255,255,.18);
-    border: 1px solid rgba(255,255,255,.35); border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.35); border-radius: var(--r-pill);
     padding: 2px 14px; font-size: 13px; margin-bottom: 14px;
   }
   h2 {
     font-size: 22px; margin: 52px 0 6px; padding-left: 12px;
-    border-left: 5px solid var(--accent);
+    border-left: 5px solid var(--accent); color: var(--ink);
   }
   h2 .step { color: var(--accent); font-size: 14px; margin-right: 8px; }
   h3 { font-size: 17px; margin: 28px 0 8px; }
@@ -48,11 +64,12 @@
   .muted { color: var(--muted); font-size: 14px; }
   .card {
     background: var(--card); border: 1px solid var(--line);
-    border-radius: 14px; padding: 20px 22px; margin: 16px 0;
+    border-radius: var(--r-md); padding: 20px 22px; margin: 16px 0;
+    box-shadow: var(--shadow-sm);
   }
   pre {
     background: var(--code-bg); border: 1px solid var(--line);
-    border-radius: 10px; padding: 14px 16px; overflow-x: auto;
+    border-radius: var(--r-sm); padding: 14px 16px; overflow-x: auto;
     font-family: Consolas, "Courier New", monospace; font-size: 14px;
     line-height: 1.7; margin: 10px 0;
   }
@@ -62,26 +79,26 @@
   }
   pre code { background: none; padding: 0; }
   .out {
-    background: #21242b; color: #d8dee9; border-radius: 10px;
+    background: #1b2422; color: #d5e0dc; border-radius: var(--r-sm);
     padding: 12px 16px; font-family: Consolas, monospace; font-size: 13.5px;
     margin: -4px 0 14px; overflow-x: auto; white-space: pre-wrap;
   }
-  .out::before { content: "运行结果"; display: block; font-size: 11px; color: #8a93a5; margin-bottom: 6px; letter-spacing: 2px; }
+  .out::before { content: "运行结果"; display: block; font-size: 11px; color: #7f938c; margin-bottom: 6px; letter-spacing: 2px; }
   .warn {
     background: var(--warn-bg); border: 1px solid var(--warn-line);
-    border-radius: 12px; padding: 12px 18px; margin: 14px 0; font-size: 14.5px;
+    border-radius: var(--r); padding: 12px 18px; margin: 14px 0; font-size: 14.5px;
   }
   .tip {
     background: var(--tip-bg); border: 1px solid var(--tip-line);
-    border-radius: 12px; padding: 12px 18px; margin: 14px 0; font-size: 14.5px;
+    border-radius: var(--r); padding: 12px 18px; margin: 14px 0; font-size: 14.5px;
   }
   .warn b, .tip b { display: block; margin-bottom: 4px; }
   table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 14.5px; background: var(--card); }
   th, td { border: 1px solid var(--line); padding: 8px 12px; text-align: left; }
-  th { background: var(--accent-light); }
+  th { background: var(--accent-light); color: var(--ink); }
   .toc {
-    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
-    padding: 20px 26px; margin-bottom: 10px;
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md);
+    padding: 20px 26px; margin-bottom: 10px; box-shadow: var(--shadow-sm);
   }
   .toc a { color: var(--accent); text-decoration: none; }
   .toc a:hover { text-decoration: underline; }
@@ -90,21 +107,39 @@
     color: var(--accent); font-weight: bold;
   }
   .file-tag {
-    display: inline-block; background: #eee9e0; border-radius: 6px;
-    font-size: 12.5px; padding: 1px 8px; color: #7a6f5d; margin-right: 6px;
+    display: inline-block; background: var(--line-soft); border-radius: 6px;
+    font-size: 12.5px; padding: 1px 8px; color: var(--muted); margin-right: 6px;
   }
   footer { margin-top: 70px; text-align: center; color: var(--muted); font-size: 13.5px; }
-  .comment { color: #8a8f98; }
-  .kw { color: #b03a8c; }
-  .str { color: #2b7a4b; }
-  .num { color: #b5621a; }
+  /* 语法高亮：统一到松石绿家族（关键字偏青、字符串偏绿、数字暖金） */
+  .comment { color: #7d8a86; }
+  .kw { color: var(--accent2); font-weight: 600; }
+  .str { color: var(--accent); }
+  .num { color: var(--gold); }
+  /* 深色「运行结果」块内的语法色改为亮色，保证可读 */
+  .out .comment { color: #7f938c; }
+  .out .kw { color: #7fd0c0; font-weight: normal; }
+  .out .str { color: #9ee0c2; }
+  .out .num { color: #e6bb78; }
+
+  /* 右上角浮动导航 */
+  .nav-float { position: fixed; top: 14px; right: 14px; z-index: 99; display: flex; gap: 8px; }
+  .pill {
+    font-size: 12.5px; text-decoration: none; border-radius: var(--r-pill); padding: 6px 14px;
+    background: rgba(255,255,255,.94); color: var(--muted); border: 1px solid var(--line);
+    box-shadow: var(--shadow-sm); transition: all .2s;
+    font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+  }
+  .pill:hover { color: var(--accent); border-color: var(--accent-line); background: var(--accent-soft); }
+  .pill.primary { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 6px 16px -6px var(--accent-glow); }
+  .pill.primary:hover { background: var(--accent-deep); color: #fff; }
 </style>
 </head>
 <body>
 
-<div style="position:fixed;top:14px;right:14px;z-index:99;display:flex;gap:8px;">
-  <a href="index.html" style="font-size:12.5px;color:#5b6472;text-decoration:none;background:rgba(255,255,255,.94);border:1px solid #e0ddd5;border-radius:999px;padding:6px 14px;box-shadow:0 2px 8px rgba(60,60,50,.08);font-family:'Microsoft YaHei',sans-serif;">🏠 首页</a>
-  <a href="python闯关岛.html" style="font-size:12.5px;color:#fff;text-decoration:none;background:#2b7a4b;border-radius:999px;padding:6px 14px;box-shadow:0 2px 8px rgba(43,122,75,.25);font-family:'Microsoft YaHei',sans-serif;">🎮 去闯关</a>
+<div class="nav-float">
+  <a href="index.html" class="pill">🏠 首页</a>
+  <a href="python闯关岛.html" class="pill primary">🎮 去闯关</a>
 </div>
 
 <div class="wrap">

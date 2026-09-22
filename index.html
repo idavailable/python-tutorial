@@ -5,15 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Python 小白起飞教程 · 零基础入门学习包</title>
 <style>
+  /* ===== 全站统一设计变量 · v1（浅色 / 松石绿） ===== */
   :root {
-    --bg: #f6f7f2; --card: #fff; --ink: #2b2a26; --muted: #75706a;
-    --green: #2b7a4b; --green-light: #e6f4ec; --blue: #2d6da3; --blue-light: #e8f1fa;
-    --line: #e5e2da; --shadow: 0 4px 16px rgba(60,60,50,.08);
+    --accent: #17795f;
+    --accent-deep: #0e5744;
+    --accent-500: #24a081;
+    --accent-soft: #e7f3ef;
+    --accent-line: #b9dcd1;
+    --accent-glow: rgba(23, 121, 95, .14);
+    --accent2: #1d6a78;
+    --accent2-soft: #e6f1f3;
+    --bg: #f2f6f5; --card: #ffffff; --ink: #1d2b28; --ink-soft: #3d4a47; --muted: #6c7b77;
+    --line: #e3ebe8; --line-soft: #eff4f2; --gold: #c08a12; --gold-soft: #fdf4de;
+    --shadow-sm: 0 2px 6px rgba(16, 54, 44, .05);
+    --shadow: 0 4px 16px rgba(16, 54, 44, .07);
+    --shadow-lg: 0 14px 34px rgba(16, 54, 44, .13);
+    --r-sm: 10px; --r: 12px; --r-md: 14px; --r-lg: 18px; --r-pill: 999px;
+    /* 兼容旧变量名 */
+    --green: var(--accent); --green-light: var(--accent-soft);
+    --blue: var(--accent2); --blue-light: var(--accent2-soft);
   }
   * { box-sizing: border-box; }
   body {
     margin: 0; background: var(--bg); color: var(--ink); min-height: 100vh;
-    font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif; line-height: 1.75;
+    font-family: "Microsoft YaHei", "PingFang SC", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.75; -webkit-font-smoothing: antialiased;
   }
   .wrap { max-width: 780px; margin: 0 auto; padding: 60px 22px 80px; }
   header { text-align: center; margin-bottom: 40px; }
@@ -22,39 +38,45 @@
   header p { color: var(--muted); margin: 0; font-size: 15px; }
   .stats { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
   .stats span {
-    background: #fff; border: 1px solid var(--line); border-radius: 999px;
-    padding: 6px 16px; font-size: 13px; color: var(--muted); box-shadow: 0 2px 6px rgba(60,60,50,.05);
+    background: #fff; border: 1px solid var(--line); border-radius: var(--r-pill);
+    padding: 6px 16px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow-sm);
   }
-  .stats b { color: var(--green); }
+  .stats b { color: var(--accent); }
   .cards { display: grid; gap: 18px; }
   .card {
     display: block; text-decoration: none; color: inherit; background: var(--card);
-    border: 1px solid var(--line); border-radius: 18px; padding: 26px 28px;
-    box-shadow: var(--shadow); transition: transform .15s, box-shadow .15s;
+    border: 1px solid var(--line); border-radius: var(--r-lg); padding: 26px 28px;
+    box-shadow: var(--shadow); transition: transform .18s, box-shadow .18s, border-color .18s;
     display: flex; gap: 20px; align-items: flex-start;
   }
-  .card:hover { transform: translateY(-4px); box-shadow: 0 12px 26px rgba(60,60,50,.13); }
+  .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--accent-line); }
   .ico {
-    flex: none; width: 58px; height: 58px; border-radius: 16px;
+    flex: none; width: 58px; height: 58px; border-radius: var(--r-md);
     display: flex; align-items: center; justify-content: center; font-size: 30px;
   }
-  .ico.g { background: var(--green-light); }
-  .ico.b { background: var(--blue-light); }
-  .card h2 { font-size: 19px; margin: 0 0 4px; }
+  .ico.g { background: var(--accent-soft); }
+  .ico.b { background: var(--accent2-soft); }
+  .card h2 { font-size: 19px; margin: 0 0 4px; transition: color .2s; }
+  .card:hover h2 { color: var(--accent); }
   .card .desc { color: var(--muted); font-size: 14px; margin: 0; }
   .card .tag {
-    display: inline-block; font-size: 12px; color: var(--blue); background: var(--blue-light);
-    border-radius: 99px; padding: 1px 12px; margin-top: 10px;
+    display: inline-block; font-size: 12px; color: var(--accent2); background: var(--accent2-soft);
+    border-radius: var(--r-pill); padding: 2px 12px; margin-top: 10px;
   }
   .steps {
-    background: var(--card); border: 1px solid var(--line); border-radius: 18px;
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg);
     padding: 24px 28px; margin-top: 34px; box-shadow: var(--shadow);
   }
   .steps h3 { margin: 0 0 12px; font-size: 17px; }
-  .flow { font-family: Consolas, monospace; font-size: 14px; color: var(--green); white-space: pre-line; line-height: 2; }
+  .flow { font-family: Consolas, monospace; font-size: 14px; color: var(--accent); white-space: pre-line; line-height: 2; }
   .steps ul { padding-left: 20px; margin: 12px 0 0; font-size: 14.5px; }
   footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 50px; }
-  footer a { color: var(--muted); }
+  footer a { color: var(--accent); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  @media (max-width: 640px) {
+    .wrap { padding: 36px 16px 56px; }
+    .card { flex-direction: column; gap: 14px; padding: 22px; }
+  }
 </style>
 </head>
 <body>
